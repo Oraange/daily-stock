@@ -1,0 +1,310 @@
+:root {
+  /* surfaces */
+  --bg: #fcf1ea;
+  --surface: #ffffff;
+  --soft-1: #faf8f4;
+  --soft-2: #f7f5f1;
+  --soft-3: #faf9f6;
+  /* ink */
+  --ink: #211f1b;
+  --ink-2: #8a857d;
+  --ink-3: #a49e93;
+  --ink-4: #b3ada2;
+  /* borders */
+  --border: rgba(0, 0, 0, 0.05);
+  --border-2: rgba(0, 0, 0, 0.08);
+  /* brand coral */
+  --coral: #ff6b4a;
+  --coral-deep: #ff5a36;
+  --coral-bg: #fff2ec;
+  --coral-grad: linear-gradient(140deg, #ff8a5c, #ff6b4a);
+  /* 한국 관례: 상승 빨강 / 하락 파랑 */
+  --up: #f04438;
+  --up-bg: #fdecea;
+  --down: #2f6bed;
+  --down-bg: #eaf0fd;
+  /* dark primary */
+  --dark: #211f1b;
+  --dark-hover: #37342e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: var(--ink);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.14);
+  border-radius: 8px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+@keyframes floatIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+button {
+  font-family: inherit;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  background: var(--bg);
+}
+
+/* ---- 사이드바 ---- */
+
+.sidebar {
+  width: 236px;
+  flex: none;
+  background: var(--surface);
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 22px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 13px;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: 0.15s;
+  background: none;
+  color: var(--ink-2);
+}
+
+.nav-item:hover {
+  filter: brightness(0.98);
+}
+
+.nav-item.active {
+  background: var(--coral-bg);
+  color: var(--coral-deep);
+}
+
+/* ---- 공통 ---- */
+
+.screen {
+  animation: floatIn 0.4s ease;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 22px 24px;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+.btn-dark {
+  border: none;
+  border-radius: 13px;
+  background: var(--dark);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.btn-dark:hover {
+  background: var(--dark-hover);
+}
+
+.link-coral {
+  border: none;
+  background: none;
+  color: var(--coral);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.icon-btn {
+  border-radius: 10px;
+  border: 1px solid var(--border-2);
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* ---- 헤더 ---- */
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 26px 34px 6px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.content {
+  padding: 22px 34px 44px;
+  flex: 1;
+}
+
+/* ---- 매매일지 ---- */
+
+.journal-row {
+  display: grid;
+  grid-template-columns: 1.4fr 0.7fr 0.7fr 0.8fr 1fr 0.9fr;
+  gap: 12px;
+  padding: 15px 22px;
+  align-items: center;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  transition: background 0.12s;
+}
+
+.journal-row:hover {
+  background: var(--soft-3);
+}
+
+/* ---- 모달 폼 ---- */
+
+.field-input {
+  width: 100%;
+  padding: 13px 15px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--soft-1);
+  color: var(--ink);
+}
+
+.field-input:focus {
+  border-color: var(--coral);
+  background: #fff;
+  outline: none;
+}
+
+textarea.field-input {
+  min-height: 88px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.field-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink-2);
+  display: block;
+  margin-bottom: 7px;
+}
+
+/* ---- 반응형: 좁은 화면에서 사이드바 → 하단 탭바 ---- */
+
+.mobile-nav {
+  display: none;
+}
+
+@media (max-width: 880px) {
+  .sidebar {
+    display: none;
+  }
+
+  .page-header {
+    padding: 20px 18px 4px;
+  }
+
+  .content {
+    padding: 16px 18px 96px;
+  }
+
+  .grid-2col,
+  .chart-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .mobile-nav {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    background: var(--surface);
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+    align-items: center;
+    justify-content: space-around;
+  }
+
+  .mobile-nav button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--ink-3);
+    padding: 6px 8px;
+    border-radius: 10px;
+  }
+
+  .mobile-nav button.active {
+    color: var(--coral-deep);
+    background: var(--coral-bg);
+  }
+
+  .mobile-nav .fab {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--coral-grad);
+    color: #fff;
+    font-size: 22px;
+    font-weight: 800;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 14px rgba(255, 107, 74, 0.32);
+    padding: 0;
+  }
+}

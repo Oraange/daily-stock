@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#fcf1ea;font-family:"Pretendard Variable",Pretendard,system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:#211f1b}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:rgba(0,0,0,.14);border-radius:8px;border:3px solid transparent;background-clip:content-box}
+  @keyframes floatIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @keyframes drawLine{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;background:#fcf1ea">
+
+  <!-- SIDEBAR -->
+  <aside style="width:236px;flex:none;background:#ffffff;border-right:1px solid rgba(0,0,0,.06);padding:22px 16px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh">
+    <div style="display:flex;align-items:center;gap:11px;padding:6px 8px 20px">
+      <div style="width:38px;height:38px;border-radius:12px;background:linear-gradient(140deg,#ff8a5c,#ff6b4a);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:19px;box-shadow:0 6px 14px rgba(255,107,74,.32)">매</div>
+      <div>
+        <div style="font-weight:800;font-size:16px;letter-spacing:-.02em">매매노트</div>
+        <div style="font-size:11px;color:#a49e93;font-weight:600;margin-top:1px">나의 투자 회고</div>
+      </div>
+    </div>
+
+    <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="5">
+      <button onClick="{{ item.go }}" style="{{ item.style }}" style-hover="filter:brightness(.98)">
+        <span style="font-size:17px;width:22px;text-align:center">{{ item.icon }}</span>
+        <span>{{ item.label }}</span>
+      </button>
+    </sc-for>
+
+    <div style="margin-top:auto;display:flex;flex-direction:column;gap:12px">
+      <button onClick="{{ openModal }}" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border:none;border-radius:13px;background:#211f1b;color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit" style-hover="background:#37342e">
+        <span style="font-size:16px">＋</span> 새 매매 기록
+      </button>
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:12px;background:#f7f5f1">
+        <div style="width:34px;height:34px;border-radius:50%;background:#ffe0d3;display:flex;align-items:center;justify-content:center;font-size:16px">🐣</div>
+        <div style="line-height:1.25">
+          <div style="font-weight:700;font-size:13px">투자자님</div>
+          <div style="font-size:11px;color:#a49e93;font-weight:600">투자 시작 6개월차</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main style="flex:1;min-width:0;display:flex;flex-direction:column">
+    <header style="display:flex;align-items:center;justify-content:space-between;padding:26px 34px 6px;flex-wrap:wrap;gap:12px">
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#ff6b4a;letter-spacing:.04em;margin-bottom:5px">{{ screenKicker }}</div>
+        <h1 style="margin:0;font-size:25px;font-weight:800;letter-spacing:-.03em">{{ screenTitle }}</h1>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="display:flex;align-items:center;gap:8px;padding:9px 15px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:11px;font-weight:700;font-size:13px">
+          <span style="width:8px;height:8px;border-radius:50%;background:#3aa17e"></span> 2026년 7월
+        </div>
+        <div style="width:40px;height:40px;border-radius:11px;background:#fff;border:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer">🔔</div>
+      </div>
+    </header>
+
+    <div style="padding:22px 34px 44px;flex:1">
+
+      <!-- ============ DASHBOARD ============ -->
+      <sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:20px;animation:floatIn .4s ease">
+        <!-- KPI row -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px">
+          <div style="grid-column:span 1;background:linear-gradient(150deg,#2a2723,#151311);border-radius:20px;padding:22px 24px;color:#fff;position:relative;overflow:hidden">
+            <div style="font-size:13px;color:#c9c2b6;font-weight:600">총 자산</div>
+            <div style="font-size:30px;font-weight:800;letter-spacing:-.03em;margin-top:8px;font-variant-numeric:tabular-nums">₩32,480,000</div>
+            <div style="display:inline-flex;align-items:center;gap:5px;margin-top:12px;padding:5px 10px;background:rgba(240,68,56,.18);border-radius:20px;font-size:12.5px;font-weight:700;color:#ff8178">▲ +4,280,000 (+15.2%)</div>
+            <div style="position:absolute;right:-30px;bottom:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(255,107,74,.35),transparent 70%)"></div>
+          </div>
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="3">
+            <div style="background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:20px;padding:22px 24px">
+              <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#a49e93;font-weight:600">
+                <span style="font-size:15px">{{ k.icon }}</span>{{ k.label }}
+              </div>
+              <div style="font-size:26px;font-weight:800;letter-spacing:-.03em;margin-top:10px;font-variant-numeric:tabular-nums">{{ k.value }}</div>
+              <div style="{{ k.deltaStyle }}">{{ k.delta }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- Chart + winrate -->
+        <div style="display:grid;grid-template-columns:1.7fr 1fr;gap:16px">
+          <div style="background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:20px;padding:22px 24px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+              <div style="font-weight:800;font-size:15px">자산 추이</div>
+              <div style="font-size:12px;color:#a49e93;font-weight:600">최근 30일</div>
+            </div>
+            <div style="width:100%">{{ equityEl }}</div>
+          </div>
+          <div style="background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:20px;padding:22px 24px;display:flex;flex-direction:column">
+            <div style="font-weight:800;font-size:15px;margin-bottom:14px">이번 달 매매 성향</div>
+            <div style="display:flex;align-items:center;gap:18px;margin-bottom:16px">
+              {{ donutEl }}
+              <div style="line-height:1.5">
+                <div style="font-size:12px;color:#a49e93;font-weight:600">승률</div>
+                <div style="font-size:30px;font-weight:800;color:#f04438;line-height:1;font-variant-numeric:tabular-nums">62%</div>
+                <div style="font-size:12px;color:#a49e93;font-weight:600;margin-top:6px">21승 · 13패</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600"><span style="color:#8a857d">평균 수익</span><span style="color:#f04438;font-weight:700">+3.4%</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600"><span style="color:#8a857d">평균 손실</span><span style="color:#2f6bed;font-weight:700">-1.9%</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600"><span style="color:#8a857d">손익비</span><span style="font-weight:700">1.8</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent trades -->
+        <div style="background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:20px;padding:22px 24px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <div style="font-weight:800;font-size:15px">최근 매매</div>
+            <button onClick="{{ goJournal }}" style="border:none;background:none;color:#ff6b4a;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">전체보기 →</button>
+          </div>
+          <sc-for list="{{ recentTrades }}" as="t" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:14px;padding:12px 6px;border-top:1px solid rgba(0,0,0,.05)">
+              <div style="width:40px;height:40px;border-radius:12px;background:#f5f2ed;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#6b655b">{{ t.initial }}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-weight:700;font-size:14px">{{ t.name }}</div>
+                <div style="font-size:12px;color:#a49e93;font-weight:600">{{ t.date }} · {{ t.side }} · {{ t.qty }}주</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:9px;font-size:12px;font-weight:700" style="{{ t.emoChip }}">{{ t.emotion }}</div>
+              <div style="text-align:right;min-width:96px">
+                <div style="font-weight:800;font-size:14px;font-variant-numeric:tabular-nums" style="{{ t.pnlStyle }}">{{ t.pnlText }}</div>
+                <div style="font-size:12px;font-weight:700" style="{{ t.pnlStyle }}">{{ t.ret }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ CALENDAR ============ -->
+      <sc-if value="{{ isCal }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:floatIn .4s ease">
+        <!-- toggle + summary -->
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:18px">
+          <div style="display:inline-flex;padding:4px;background:#ece8e1;border-radius:13px">
+            <button onClick="{{ setMonthMode }}" style="{{ monthBtnStyle }}">월간</button>
+            <button onClick="{{ setWeekMode }}" style="{{ weekBtnStyle }}">주간 자산추이</button>
+          </div>
+          <div style="display:flex;gap:14px">
+            <div style="background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:14px;padding:11px 18px;text-align:center">
+              <div style="font-size:11px;color:#a49e93;font-weight:600">7월 실현손익</div>
+              <div style="font-size:18px;font-weight:800;color:#f04438;font-variant-numeric:tabular-nums">+1,240,000</div>
+            </div>
+            <div style="background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:14px;padding:11px 18px;text-align:center">
+              <div style="font-size:11px;color:#a49e93;font-weight:600">거래일</div>
+              <div style="font-size:18px;font-weight:800;font-variant-numeric:tabular-nums">17일</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MONTH GRID -->
+        <sc-if value="{{ isMonthMode }}" hint-placeholder-val="{{ true }}">
+        <div style="background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:20px;padding:18px 20px 22px">
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:10px">
+            <sc-for list="{{ dows }}" as="w" hint-placeholder-count="7">
+              <div style="text-align:center;font-size:12px;font-weight:700;padding:4px 0" style="{{ w.style }}">{{ w.label }}</div>
+            </sc-for>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px">
+            <sc-for list="{{ monthCells }}" as="c" hint-placeholder-count="35">
+              <div style="{{ c.cellStyle }}">
+                <sc-if value="{{ c.filled }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;align-items:center;justify-content:space-between">
+                    <span style="font-size:12px;font-weight:700" style="{{ c.dayStyle }}">{{ c.d }}</span>
+                    <sc-if value="{{ c.traded }}" hint-placeholder-val="{{ true }}"><span style="width:6px;height:6px;border-radius:50%" style="{{ c.dotStyle }}"></span></sc-if>
+                  </div>
+                  <div style="margin-top:auto">
+                    <div style="font-size:13.5px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em" style="{{ c.pnlStyle }}">{{ c.pnlText }}</div>
+                    <div style="font-size:10.5px;color:#b3ada2;font-weight:600;font-variant-numeric:tabular-nums">{{ c.assetText }}</div>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:18px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(0,0,0,.05);font-size:12px;font-weight:600;color:#8a857d">
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:#fdecea"></span>수익일</span>
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:#eaf0fd"></span>손실일</span>
+            <span style="margin-left:auto">하단 회색 숫자 = 그날의 총 자산</span>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- WEEK LINE GRAPH -->
+        <sc-if value="{{ isWeekMode }}" hint-placeholder-val="{{ true }}">
+        <div style="background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:20px;padding:20px 24px 24px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <div>
+              <div style="font-weight:800;font-size:16px">{{ weekLabel }}</div>
+              <div style="font-size:12px;color:#a49e93;font-weight:600;margin-top:2px">한 주 동안의 자산 변동을 이어서 확인해요</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <button onClick="{{ prevWeek }}" style="width:36px;height:36px;border-radius:10px;border:1px solid rgba(0,0,0,.08);background:#fff;cursor:pointer;font-size:15px;font-weight:700">‹</button>
+              <div style="font-size:13px;font-weight:700;color:#8a857d;min-width:74px;text-align:center">{{ weekRange }}</div>
+              <button onClick="{{ nextWeek }}" style="width:36px;height:36px;border-radius:10px;border:1px solid rgba(0,0,0,.08);background:#fff;cursor:pointer;font-size:15px;font-weight:700">›</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:24px;flex-wrap:wrap;margin:14px 0 6px">
+            <div><div style="font-size:11px;color:#a49e93;font-weight:600">주간 변동</div><div style="font-size:20px;font-weight:800;font-variant-numeric:tabular-nums" style="{{ weekDeltaStyle }}">{{ weekDelta }}</div></div>
+            <div><div style="font-size:11px;color:#a49e93;font-weight:600">주말 자산</div><div style="font-size:20px;font-weight:800;font-variant-numeric:tabular-nums">{{ weekEndAsset }}</div></div>
+          </div>
+          <div style="width:100%;margin-top:8px">{{ weeklyEl }}</div>
+        </div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <!-- ============ JOURNAL LIST ============ -->
+      <sc-if value="{{ isJournal }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:floatIn .4s ease">
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          <sc-for list="{{ filters }}" as="f" hint-placeholder-count="4">
+            <button style="{{ f.style }}">{{ f.label }}</button>
+          </sc-for>
+        </div>
+        <div style="background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:20px;overflow:hidden">
+          <div style="display:grid;grid-template-columns:1.4fr .7fr .7fr .8fr 1fr .9fr;gap:12px;padding:14px 22px;background:#faf8f4;font-size:12px;font-weight:700;color:#a49e93;border-bottom:1px solid rgba(0,0,0,.05)">
+            <span>종목</span><span>구분</span><span>수량</span><span style="text-align:right">평단/청산</span><span style="text-align:right">손익</span><span style="text-align:center">감정</span>
+          </div>
+          <sc-for list="{{ trades }}" as="t" hint-placeholder-count="8">
+            <div style="display:grid;grid-template-columns:1.4fr .7fr .7fr .8fr 1fr .9fr;gap:12px;padding:15px 22px;align-items:center;border-top:1px solid rgba(0,0,0,.04)" style-hover="background:#faf9f6">
+              <div style="display:flex;align-items:center;gap:11px">
+                <div style="width:36px;height:36px;border-radius:10px;background:#f5f2ed;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#6b655b">{{ t.initial }}</div>
+                <div><div style="font-weight:700;font-size:14px">{{ t.name }}</div><div style="font-size:11.5px;color:#b3ada2;font-weight:600">{{ t.date }}</div></div>
+              </div>
+              <span style="font-size:13px;font-weight:700" style="{{ t.sideStyle }}">{{ t.side }}</span>
+              <span style="font-size:13px;font-weight:600;color:#6b655b;font-variant-numeric:tabular-nums">{{ t.qty }}주</span>
+              <div style="text-align:right;font-size:12.5px;font-weight:600;color:#6b655b;font-variant-numeric:tabular-nums"><div>{{ t.buy }}</div><div style="color:#b3ada2">{{ t.sell }}</div></div>
+              <div style="text-align:right;font-variant-numeric:tabular-nums"><div style="font-weight:800;font-size:14px" style="{{ t.pnlStyle }}">{{ t.pnlText }}</div><div style="font-size:12px;font-weight:700" style="{{ t.pnlStyle }}">{{ t.ret }}</div></div>
+              <div style="display:flex;justify-content:center"><span style="padding:5px 11px;border-radius:9px;font-size:12px;font-weight:700" style="{{ t.emoChip }}">{{ t.emotion }}</span></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ ANALYSIS ============ -->
+      <sc-if value="{{ isAnalysis }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:18px;animation:floatIn .4s ease">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:14px">
+          <sc-for list="{{ stats }}" as="s" hint-placeholder-count="6">
+            <div style="background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:18px;padding:18px 20px">
+              <div style="font-size:12.5px;color:#a49e93;font-weight:600">{{ s.label }}</div>
+              <div style="font-size:24px;font-weight:800;margin-top:8px;letter-spacing:-.02em;font-variant-numeric:tabular-nums" style="{{ s.style }}">{{ s.value }}</div>
+              <div style="font-size:11.5px;color:#b3ada2;font-weight:600;margin-top:3px">{{ s.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+          <div style="background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:20px;padding:22px 24px">
+            <div style="font-weight:800;font-size:15px;margin-bottom:4px">감정별 승률</div>
+            <div style="font-size:12px;color:#a49e93;font-weight:600;margin-bottom:18px">어떤 마음일 때 결과가 좋았나요?</div>
+            <sc-for list="{{ emoStats }}" as="e" hint-placeholder-count="5">
+              <div style="margin-bottom:15px">
+                <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:6px"><span>{{ e.label }}</span><span style="color:#6b655b">{{ e.win }}% · {{ e.count }}회</span></div>
+                <div style="height:9px;background:#f0ede7;border-radius:6px;overflow:hidden"><div style="height:100%;border-radius:6px" style="{{ e.barStyle }}"></div></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:20px;padding:22px 24px">
+            <div style="font-weight:800;font-size:15px;margin-bottom:4px">요일별 손익</div>
+            <div style="font-size:12px;color:#a49e93;font-weight:600;margin-bottom:8px">거래 요일에 따른 성과 분포</div>
+            <div style="width:100%">{{ weekdayBarEl }}</div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ REFLECTION ============ -->
+      <sc-if value="{{ isReflect }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:16px;max-width:820px;animation:floatIn .4s ease">
+        <div style="background:linear-gradient(135deg,#fff2ec,#fdeee6);border:1px solid #ffddcf;border-radius:20px;padding:22px 26px">
+          <div style="font-weight:800;font-size:16px;margin-bottom:4px">🌱 이번 주 회고</div>
+          <div style="font-size:13.5px;color:#7a6f63;font-weight:500;line-height:1.6">손절은 잘 지켰지만, 수익 구간에서 <b style="color:#f04438">욕심</b>을 냈던 거래가 3건 있었어요. 목표가 도달 시 절반 익절 원칙을 다음 주에 지켜봐요.</div>
+        </div>
+        <sc-for list="{{ reflections }}" as="r" hint-placeholder-count="4">
+          <div style="background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:18px;padding:20px 24px">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+              <span style="padding:5px 12px;border-radius:9px;font-size:12.5px;font-weight:700" style="{{ r.emoChip }}">{{ r.emotion }}</span>
+              <div style="font-weight:700;font-size:14px">{{ r.name }}</div>
+              <div style="font-size:12px;color:#b3ada2;font-weight:600">{{ r.date }}</div>
+              <div style="margin-left:auto;font-weight:800;font-size:15px;font-variant-numeric:tabular-nums" style="{{ r.pnlStyle }}">{{ r.ret }}</div>
+            </div>
+            <div style="font-size:13.5px;color:#5c554b;font-weight:500;line-height:1.65;padding:13px 16px;background:#faf8f4;border-radius:12px;border-left:3px solid" style="{{ r.memoBorder }}">"{{ r.memo }}"</div>
+          </div>
+        </sc-for>
+      </div>
+      </sc-if>
+
+    </div>
+  </main>
+
+  <!-- ============ NEW TRADE MODAL ============ -->
+  <sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeModal }}" style="position:fixed;inset:0;background:rgba(28,25,21,.42);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:50;animation:floatIn .2s ease">
+    <div onClick="{{ stop }}" style="width:min(520px,92vw);max-height:90vh;overflow:auto;background:#fff;border-radius:24px;padding:28px 30px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px">
+        <div style="font-size:19px;font-weight:800;letter-spacing:-.02em">새 매매 기록</div>
+        <button onClick="{{ closeModal }}" style="width:34px;height:34px;border-radius:10px;border:none;background:#f2efe9;cursor:pointer;font-size:17px;color:#8a857d">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div>
+          <label style="font-size:12.5px;font-weight:700;color:#8a857d;display:block;margin-bottom:7px">종목명</label>
+          <input placeholder="예) 삼성전자" style="width:100%;padding:13px 15px;border:1px solid rgba(0,0,0,.1);border-radius:12px;font-size:14px;font-family:inherit;background:#faf8f4" style-focus="border-color:#ff6b4a;background:#fff;outline:none">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <label style="font-size:12.5px;font-weight:700;color:#8a857d;display:block;margin-bottom:7px">구분</label>
+            <div style="display:flex;gap:8px">
+              <button style="flex:1;padding:12px;border:1.5px solid #f04438;border-radius:11px;background:#fdecea;color:#f04438;font-weight:700;cursor:pointer;font-family:inherit;font-size:13.5px">매수</button>
+              <button style="flex:1;padding:12px;border:1.5px solid rgba(0,0,0,.1);border-radius:11px;background:#fff;color:#8a857d;font-weight:700;cursor:pointer;font-family:inherit;font-size:13.5px">매도</button>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:12.5px;font-weight:700;color:#8a857d;display:block;margin-bottom:7px">수량</label>
+            <input placeholder="0" style="width:100%;padding:13px 15px;border:1px solid rgba(0,0,0,.1);border-radius:12px;font-size:14px;font-family:inherit;background:#faf8f4" style-focus="border-color:#ff6b4a;background:#fff;outline:none">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div><label style="font-size:12.5px;font-weight:700;color:#8a857d;display:block;margin-bottom:7px">매수가</label><input placeholder="₩0" style="width:100%;padding:13px 15px;border:1px solid rgba(0,0,0,.1);border-radius:12px;font-size:14px;font-family:inherit;background:#faf8f4" style-focus="border-color:#ff6b4a;background:#fff;outline:none"></div>
+          <div><label style="font-size:12.5px;font-weight:700;color:#8a857d;display:block;margin-bottom:7px">청산가</label><input placeholder="₩0" style="width:100%;padding:13px 15px;border:1px solid rgba(0,0,0,.1);border-radius:12px;font-size:14px;font-family:inherit;background:#faf8f4" style-focus="border-color:#ff6b4a;background:#fff;outline:none"></div>
+        </div>
+        <div>
+          <label style="font-size:12.5px;font-weight:700;color:#8a857d;display:block;margin-bottom:9px">그때의 감정</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <sc-for list="{{ emoOptions }}" as="e" hint-placeholder-count="5">
+              <button style="padding:9px 15px;border-radius:20px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;border:1.5px solid transparent" style="{{ e.chip }}">{{ e.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:12.5px;font-weight:700;color:#8a857d;display:block;margin-bottom:7px">매매 메모 / 회고</label>
+          <textarea placeholder="이 매매에서 배운 점, 지킨 원칙, 아쉬운 점을 적어보세요" style="width:100%;min-height:88px;padding:13px 15px;border:1px solid rgba(0,0,0,.1);border-radius:12px;font-size:14px;font-family:inherit;resize:vertical;background:#faf8f4;line-height:1.5" style-focus="border-color:#ff6b4a;background:#fff;outline:none"></textarea>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:4px">
+          <button onClick="{{ closeModal }}" style="flex:1;padding:14px;border:1px solid rgba(0,0,0,.1);border-radius:13px;background:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;color:#6b655b">취소</button>
+          <button onClick="{{ closeModal }}" style="flex:2;padding:14px;border:none;border-radius:13px;background:#211f1b;color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit" style-hover="background:#37342e">기록 저장하기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180,&quot;height&quot;:840}}">
+class Component extends DCLogic {
+  state = { screen: 'dash', calMode: 'month', week: 1, modal: false };
+
+  h = React.createElement;
+
+  seeded(n){ const x = Math.sin(n*57.13)*10000; return x - Math.floor(x); }
+
+  buildMonth(){
+    const y=2026, m=6; // July 2026
+    const startDay = new Date(y,m,1).getDay();
+    const days = new Date(y,m+1,0).getDate();
+    let asset = 31240000;
+    const list=[];
+    for(let d=1; d<=days; d++){
+      const wd = new Date(y,m,d).getDay();
+      const r = this.seeded(d);
+      const traded = wd!==0 && wd!==6 && r>0.30;
+      let pnl=0;
+      if(traded){
+        const up = r>0.44;
+        const mag = 90000 + Math.floor(this.seeded(d*3)*680000);
+        pnl = up ? mag : -Math.floor(mag*0.62);
+        asset += pnl;
+      }
+      list.push({ d, wd, traded, pnl, asset });
+    }
+    return { startDay, days, list };
+  }
+
+  get month(){ if(!this._m) this._m = this.buildMonth(); return this._m; }
+
+  get weeks(){
+    if(this._w) return this._w;
+    const {startDay, list} = this.month;
+    const cells=[];
+    for(let i=0;i<startDay;i++) cells.push(null);
+    list.forEach(x=>cells.push(x));
+    while(cells.length%7) cells.push(null);
+    const weeks=[];
+    for(let i=0;i<cells.length;i+=7) weeks.push(cells.slice(i,i+7));
+    this._w = weeks;
+    return weeks;
+  }
+
+  won(n){ return '₩'+Math.round(n).toLocaleString('en-US'); }
+  eok(n){ // shorten to 만 단위
+    return (Math.round(n/10000)).toLocaleString('en-US')+'만';
+  }
+  signed(n){ return (n>=0?'+':'')+Math.round(n).toLocaleString('en-US'); }
+
+  emoColor(e){
+    const map={ '침착':'#2f9e78','자신감':'#e0982f','불안':'#4f86d6','욕심':'#e5675e','조급':'#a874d6','후회':'#8a857d' };
+    return map[e]||'#8a857d';
+  }
+  emoChipStyle(e){ const c=this.emoColor(e); return { color:c, background:c+'1f' }; }
+
+  navStyle(id){
+    const active = this.state.screen===id;
+    return `display:flex;align-items:center;gap:11px;padding:11px 13px;border:none;border-radius:12px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;text-align:left;width:100%;transition:.15s;`
+      + (active ? 'background:#fff2ec;color:#ff5a36;' : 'background:none;color:#8a857d;');
+  }
+
+  // ---- charts ----
+  linePts(vals,w,ht,pad){
+    const real=vals.filter(v=>v!=null);
+    const min=Math.min(...real), max=Math.max(...real), rng=(max-min)||1;
+    return vals.map((v,i)=> v==null?null:[ pad + i*(w-2*pad)/(vals.length-1), ht-pad-((v-min)/rng)*(ht-2*pad) ]);
+  }
+
+  equityEl(){
+    const h=this.h;
+    const series = this.month.list.map(x=>x.asset);
+    const w=640, ht=190, pad=14;
+    const pts=this.linePts(series,w,ht,pad);
+    const d = pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+    const area = d+` L${(w-pad)} ${ht-pad} L${pad} ${ht-pad} Z`;
+    return h('svg',{viewBox:`0 0 ${w} ${ht}`,width:'100%',height:ht,preserveAspectRatio:'none',style:{display:'block'}},
+      h('defs',null,h('linearGradient',{id:'eq',x1:0,y1:0,x2:0,y2:1},
+        h('stop',{offset:'0%',stopColor:'#ff6b4a',stopOpacity:.22}),
+        h('stop',{offset:'100%',stopColor:'#ff6b4a',stopOpacity:0}))),
+      h('path',{d:area,fill:'url(#eq)'}),
+      h('path',{d,fill:'none',stroke:'#ff6b4a',strokeWidth:2.5,strokeLinecap:'round',strokeLinejoin:'round'}),
+      h('circle',{cx:pts[pts.length-1][0],cy:pts[pts.length-1][1],r:4.5,fill:'#ff6b4a',stroke:'#fff',strokeWidth:2})
+    );
+  }
+
+  donutEl(){
+    const h=this.h, r=42, c=2*Math.PI*r, win=0.62;
+    return h('svg',{width:96,height:96,viewBox:'0 0 96 96'},
+      h('circle',{cx:48,cy:48,r,fill:'none',stroke:'#eaf0fd',strokeWidth:12}),
+      h('circle',{cx:48,cy:48,r,fill:'none',stroke:'#f04438',strokeWidth:12,strokeLinecap:'round',
+        strokeDasharray:`${c*win} ${c}`,transform:'rotate(-90 48 48)'})
+    );
+  }
+
+  weeklyEl(){
+    const h=this.h;
+    const week=this.weeks[this.state.week]||this.weeks[0];
+    const w=680, ht=260, padX=44, padY=44;
+    const vals=week.map(c=>c?c.asset:null);
+    const pts=this.linePts(vals,w,ht,padX); // reuse padX both axes via padY below
+    // recompute y with padY
+    const real=vals.filter(v=>v!=null);
+    const min=Math.min(...real), max=Math.max(...real), rng=(max-min)||1;
+    const P=vals.map((v,i)=> v==null?null:[ padX + i*(w-2*padX)/6, ht-padY-((v-min)/rng)*(ht-2*padY) ]);
+    const drawn=P.filter(p=>p);
+    const d=drawn.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+    const dows=['일','월','화','수','목','금','토'];
+    const gridY=[0,.5,1].map(f=>padY+f*(ht-2*padY));
+    return h('svg',{viewBox:`0 0 ${w} ${ht}`,width:'100%',height:ht,style:{display:'block'}},
+      h('defs',null,h('linearGradient',{id:'wk',x1:0,y1:0,x2:0,y2:1},
+        h('stop',{offset:'0%',stopColor:'#f04438',stopOpacity:.16}),
+        h('stop',{offset:'100%',stopColor:'#f04438',stopOpacity:0}))),
+      ...gridY.map(y=>h('line',{x1:padX,x2:w-padX,y1:y,y2:y,stroke:'#f0ede7',strokeWidth:1})),
+      drawn.length>1 && h('path',{d:d+` L${drawn[drawn.length-1][0]} ${ht-padY} L${drawn[0][0]} ${ht-padY} Z`,fill:'url(#wk)'}),
+      drawn.length>1 && h('path',{d,fill:'none',stroke:'#f04438',strokeWidth:3,strokeLinecap:'round',strokeLinejoin:'round'}),
+      ...P.map((p,i)=> p && h('g',{key:i},
+        h('circle',{cx:p[0],cy:p[1],r:5,fill:'#fff',stroke:'#f04438',strokeWidth:3}),
+        h('text',{x:p[0],y:p[1]-13,textAnchor:'middle',fontSize:11,fontWeight:700,fill:'#211f1b'}, this.eok(vals[i]))
+      )),
+      ...dows.map((lbl,i)=>{ const x=padX+i*(w-2*padX)/6; const c=week[i];
+        return h('text',{key:'d'+i,x,y:ht-16,textAnchor:'middle',fontSize:11.5,fontWeight:700,fill: c?'#8a857d':'#d8d3ca'}, c?(lbl+' '+c.d):lbl); })
+    );
+  }
+
+  weekdayBarEl(){
+    const h=this.h;
+    const data=[['월',420000],['화',-180000],['수',640000],['목',210000],['금',-90000]];
+    const w=460, ht=190, pad=30, base=ht-42;
+    const max=Math.max(...data.map(d=>Math.abs(d[1])))||1;
+    const bw=42;
+    return h('svg',{viewBox:`0 0 ${w} ${ht}`,width:'100%',height:ht,style:{display:'block'}},
+      h('line',{x1:pad,x2:w-pad,y1:base,y2:base,stroke:'#e8e4dd',strokeWidth:1}),
+      ...data.map((d,i)=>{ const x=pad+20+i*((w-2*pad-40)/(data.length-1)); const up=d[1]>=0;
+        const bh=Math.abs(d[1])/max*70;
+        return h('g',{key:i},
+          h('rect',{x:x-bw/2,y: up? base-bh: base, width:bw, height:bh, rx:6, fill: up?'#f04438':'#2f6bed', opacity:.9}),
+          h('text',{x,y: up? base-bh-8 : base+bh+16, textAnchor:'middle', fontSize:11, fontWeight:700, fill: up?'#f04438':'#2f6bed'}, (up?'+':'')+Math.round(d[1]/10000)+'만'),
+          h('text',{x,y:base+16,textAnchor:'middle',fontSize:12,fontWeight:700,fill:'#a49e93'}, d[0])
+        ); })
+    );
+  }
+
+  renderVals(){
+    const S=this.state, self=this;
+    const nav=[
+      ['dash','대시보드','🏠'],['cal','캘린더','📅'],['journal','매매일지','📒'],['analysis','성과분석','📊'],['reflect','회고','🌱']
+    ];
+    const navItems = nav.map(([id,label,icon])=>({ id,label,icon, style:this.navStyle(id), go:()=>this.setState({screen:id}) }));
+
+    const kpis=[
+      { icon:'💰', label:'총 손익', value:'+4,280,000', delta:'전월 대비 +8.4%', deltaStyle:'font-size:12.5px;font-weight:700;color:#f04438;margin-top:7px' },
+      { icon:'📈', label:'이번 달 손익', value:'+1,240,000', delta:'실현 기준 +4.1%', deltaStyle:'font-size:12.5px;font-weight:700;color:#f04438;margin-top:7px' },
+      { icon:'🎯', label:'평균 손익비', value:'1.8', delta:'수익 3.4% / 손실 1.9%', deltaStyle:'font-size:12.5px;font-weight:600;color:#a49e93;margin-top:7px' },
+    ];
+
+    const rawTrades=[
+      ['에코프로','07.03','매도',12,'118,400','131,200',153600,'+10.8%',true,'침착','목표가 도달, 절반 익절 후 나머지도 정리. 계획대로 실행'],
+      ['카카오','07.02','매도',30,'52,100','49,800',-69000,'-4.4%',false,'조급','반등 기대하다 손절 라인 놓침. 다음엔 -3%에서 자르기'],
+      ['삼성전자','07.01','매도',20,'71,200','74,600',68000,'+4.8%',true,'자신감','실적 발표 전 분할 매도. 뉴스 확인 후 진입한 게 주효'],
+      ['NAVER','06.30','매도',8,'186,000','179,500',-52000,'-3.5%',false,'불안','장 초반 급락에 흔들려 원칙보다 이르게 매도'],
+      ['현대차','06.27','매도',15,'241,000','256,500',232500,'+6.4%',true,'침착','배당락 전 정리. 목표 수익률 달성해 만족'],
+      ['LG에너지','06.26','매도',5,'392,000','378,000',-70000,'-3.6%',false,'욕심','고점에서 더 오를 줄 알고 버티다 손실 확대'],
+      ['SK하이닉스','06.25','매도',10,'201,000','218,000',170000,'+8.5%',true,'자신감','반도체 업황 개선 뉴스 확인 후 스윙, 성공'],
+      ['포스코','06.24','매도',18,'388,000','375,000',-234000,'-3.4%',false,'조급','장중 변동성에 예정보다 빨리 청산'],
+    ];
+    const trades=rawTrades.map(t=>({
+      name:t[0], initial:t[0][0], date:t[1], side:t[2], qty:t[3], buy:t[4], sell:t[5],
+      pnl:t[6], pnlText:this.signed(t[6]), ret:t[7], up:t[8], emotion:t[9], memo:t[10],
+      pnlStyle:`color:${t[8]?'#f04438':'#2f6bed'}`,
+      sideStyle:`color:${t[2]==='매수'?'#f04438':'#2f6bed'}`,
+      emoChip:`color:${this.emoColor(t[9])};background:${this.emoColor(t[9])}1f;padding:5px 11px;border-radius:9px;font-size:12px;font-weight:700`,
+      memoBorder:`border-color:${t[8]?'#f04438':'#2f6bed'}`,
+    }));
+
+    // dashboard cells
+    const isMonth = S.calMode==='month';
+    const dows=['일','월','화','수','목','금','토'].map((label,i)=>({ label, style:`color:${i===0?'#f04438':i===6?'#2f6bed':'#a49e93'}` }));
+
+    const monthCells = this.weeks.flat().map(c=>{
+      if(!c) return { filled:false, cellStyle:'aspect-ratio:1/.86;border-radius:12px;background:#faf8f4;opacity:.5' };
+      const gain=c.pnl>0, loss=c.pnl<0;
+      const bg = gain?'#fdecea': loss?'#eaf0fd':'#f7f5f1';
+      return {
+        filled:true, d:c.d, traded:c.traded,
+        cellStyle:`aspect-ratio:1/.86;border-radius:12px;padding:8px 9px;display:flex;flex-direction:column;background:${bg};border:1px solid rgba(0,0,0,.02)`,
+        dayStyle:`color:${c.wd===0?'#f04438':c.wd===6?'#2f6bed':'#6b655b'}`,
+        dotStyle:`background:${gain?'#f04438':loss?'#2f6bed':'#b3ada2'}`,
+        pnlStyle:`color:${gain?'#f04438':loss?'#2f6bed':'#c4beb4'}`,
+        pnlText: c.traded ? this.signed(c.pnl) : '·',
+        assetText: this.eok(c.asset),
+      };
+    });
+
+    // week nav
+    const week=this.weeks[S.week]||this.weeks[0];
+    const wReal=week.filter(x=>x);
+    const wStart=wReal[0], wEnd=wReal[wReal.length-1];
+    const wDelta = wEnd.asset - (this.weeks[S.week-1]? (this.weeks[S.week-1].filter(x=>x).slice(-1)[0].asset) : wStart.asset - (wStart.pnl||0));
+    const wUp = wDelta>=0;
+
+    const filters=['전체','수익','손실','매수','매도'].map((label,i)=>({ label,
+      style:`padding:9px 16px;border-radius:11px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;border:1px solid ${i===0?'#211f1b':'rgba(0,0,0,.08)'};background:${i===0?'#211f1b':'#fff'};color:${i===0?'#fff':'#8a857d'}` }));
+
+    const stats=[
+      { label:'승률', value:'62%', sub:'21승 13패', style:'color:#f04438' },
+      { label:'손익비', value:'1.8', sub:'평균수익 / 평균손실', style:'' },
+      { label:'총 매매', value:'84회', sub:'6개월 누적', style:'' },
+      { label:'최대 연속 수익', value:'5회', sub:'6/25 ~ 7/03', style:'color:#f04438' },
+      { label:'평균 보유', value:'3.2일', sub:'단기 스윙 위주', style:'' },
+      { label:'최대 손실', value:'-234,000', sub:'단일 매매 기준', style:'color:#2f6bed' },
+    ];
+    const emoStats=[
+      ['침착',78,18,'#2f9e78'],['자신감',71,14,'#e0982f'],['불안',44,9,'#4f86d6'],['조급',38,13,'#a874d6'],['욕심',25,8,'#e5675e']
+    ].map(([label,win,count,c])=>({ label,win,count, barStyle:`width:${win}%;background:${c}` }));
+
+    const reflections=trades.filter(t=>t.memo).slice(0,5).map(t=>({ ...t }));
+
+    const emoOptions=['침착','자신감','불안','조급','욕심'].map((label,i)=>({ label,
+      chip: i===0 ? `color:#fff;background:${this.emoColor(label)};border-color:${this.emoColor(label)}` : `color:${this.emoColor(label)};background:${this.emoColor(label)}14;border-color:${this.emoColor(label)}40` }));
+
+    return {
+      navItems,
+      screen:S.screen,
+      isDash:S.screen==='dash', isCal:S.screen==='cal', isJournal:S.screen==='journal', isAnalysis:S.screen==='analysis', isReflect:S.screen==='reflect',
+      screenKicker: {dash:'HOME',cal:'CALENDAR',journal:'JOURNAL',analysis:'ANALYTICS',reflect:'REFLECTION'}[S.screen],
+      screenTitle: {dash:'안녕하세요, 투자자님 👋',cal:'매매 캘린더',journal:'매매일지',analysis:'성과 분석',reflect:'감정 회고'}[S.screen],
+      kpis, recentTrades:trades.slice(0,4), trades, filters, stats, emoStats, reflections, dows, monthCells, emoOptions,
+      equityEl:this.equityEl(), donutEl:this.donutEl(), weeklyEl:this.weeklyEl(), weekdayBarEl:this.weekdayBarEl(),
+      goJournal:()=>this.setState({screen:'journal'}),
+      // calendar toggle
+      isMonthMode:isMonth, isWeekMode:!isMonth,
+      setMonthMode:()=>this.setState({calMode:'month'}), setWeekMode:()=>this.setState({calMode:'week'}),
+      monthBtnStyle:`padding:9px 18px;border:none;border-radius:10px;font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit;transition:.15s;background:${isMonth?'#fff':'transparent'};color:${isMonth?'#211f1b':'#8a857d'};box-shadow:${isMonth?'0 1px 4px rgba(0,0,0,.1)':'none'}`,
+      weekBtnStyle:`padding:9px 18px;border:none;border-radius:10px;font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit;transition:.15s;background:${!isMonth?'#fff':'transparent'};color:${!isMonth?'#211f1b':'#8a857d'};box-shadow:${!isMonth?'0 1px 4px rgba(0,0,0,.1)':'none'}`,
+      weekLabel:`7월 ${S.week+1}째 주`,
+      weekRange:`${wStart.d}일 ~ ${wEnd.d}일`,
+      weekDelta:this.signed(wDelta), weekDeltaStyle:`color:${wUp?'#f04438':'#2f6bed'}`,
+      weekEndAsset:this.won(wEnd.asset),
+      prevWeek:()=>this.setState({week:Math.max(0,S.week-1)}),
+      nextWeek:()=>this.setState({week:Math.min(this.weeks.length-1,S.week+1)}),
+      // modal
+      modalOpen:S.modal, openModal:()=>this.setState({modal:true}), closeModal:()=>this.setState({modal:false}),
+      stop:(e)=>e.stopPropagation(),
+    };
+  }
+}
+</script>
+</body>
+</html>
