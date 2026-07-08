@@ -1,6 +1,7 @@
 node_modules/
 dist/
 *.local
+*.tsbuildinfo
 
 # 디자인 핸드오프 원본 압축 파일 (압축 해제본은 design-handoff/에 포함)
 *.zip
