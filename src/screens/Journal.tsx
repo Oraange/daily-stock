@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { TRADES } from '../data';
-import { DOWN, UP, emoChipStyle, pnlColor, signed } from '../utils';
+import { useTrades } from '../lib/trades';
+import { DOWN, UP, emoChipStyle, pnlColor, signed, signedPct } from '../utils';
 
 const FILTERS = ['전체', '수익', '손실', '매수', '매도'] as const;
 type Filter = (typeof FILTERS)[number];
@@ -15,14 +15,15 @@ const HEADER_COLS: { label: string; align?: 'right' | 'center' }[] = [
 ];
 
 export default function Journal() {
+  const { trades } = useTrades();
   const [filter, setFilter] = useState<Filter>('전체');
 
-  const rows = TRADES.filter((t) => {
+  const rows = trades.filter((t) => {
     switch (filter) {
       case '수익':
-        return t.up;
+        return t.pnl != null && t.pnl > 0;
       case '손실':
-        return !t.up;
+        return t.pnl != null && t.pnl < 0;
       case '매수':
         return t.side === '매수';
       case '매도':
@@ -80,7 +81,7 @@ export default function Journal() {
         </div>
 
         {rows.map((t) => (
-          <div key={t.name + t.date} className="journal-row">
+          <div key={t.id} className="journal-row">
             <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
               <div
                 style={{
@@ -125,10 +126,18 @@ export default function Journal() {
               <div style={{ color: 'var(--ink-4)' }}>{t.sell}</div>
             </div>
             <div className="num" style={{ textAlign: 'right' }}>
-              <div style={{ fontWeight: 800, fontSize: 14, color: pnlColor(t.up) }}>
-                {signed(t.pnl)}
-              </div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: pnlColor(t.up) }}>{t.ret}</div>
+              {t.pnl == null ? (
+                <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--ink-3)' }}>보유중</div>
+              ) : (
+                <>
+                  <div style={{ fontWeight: 800, fontSize: 14, color: pnlColor(t.up) }}>
+                    {signed(t.pnl)}
+                  </div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: pnlColor(t.up) }}>
+                    {t.ret != null ? signedPct(t.ret) : ''}
+                  </div>
+                </>
+              )}
             </div>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <span

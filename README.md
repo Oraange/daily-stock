@@ -24,6 +24,23 @@
 - 폰트: [Pretendard](https://github.com/orioncactus/pretendard)
 - 반응형: 880px 이하에서 사이드바 → 하단 탭바 전환
 
+## 백엔드 (Supabase)
+
+백엔드는 별도 서버 없이 **Supabase**(Postgres + Auth + 자동 API)를 사용합니다.
+
+- 인증: **카카오 OAuth** (Supabase Auth)
+- 데이터: `trades` 테이블 하나가 원천 — 손익은 생성 컬럼, 승률·손익비·일별 손익·감정별/요일별 집계는 클라이언트에서 파생 계산
+- 보안: 모든 테이블에 **RLS** 적용 (`auth.uid() = user_id`)
+- 스키마: [supabase/migrations/0001_init.sql](supabase/migrations/0001_init.sql)
+
+### 초기 설정
+
+1. Supabase 프로젝트 생성 후 SQL Editor에서 `supabase/migrations/0001_init.sql` 실행
+2. [카카오 개발자 콘솔](https://developers.kakao.com)에서 앱 생성 → 카카오 로그인 활성화 →
+   Redirect URI에 `https://<project-ref>.supabase.co/auth/v1/callback` 등록
+3. Supabase 대시보드 → Authentication → Providers → Kakao 활성화 (REST API 키 + Client Secret 입력)
+4. `.env.example`을 `.env.local`로 복사하고 프로젝트 URL과 anon key 입력
+
 ## 실행 방법
 
 ```bash

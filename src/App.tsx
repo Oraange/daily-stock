@@ -1,5 +1,9 @@
 import { useState } from 'react';
 import type { CalMode, Screen } from './types';
+import { AuthProvider, useAuth } from './lib/auth';
+import { TradesProvider, useTrades } from './lib/trades';
+import { isSupabaseConfigured } from './lib/supabase';
+import LoginScreen from './components/LoginScreen';
 import Sidebar from './components/Sidebar';
 import MobileNav from './components/MobileNav';
 import TradeModal from './components/TradeModal';
@@ -17,19 +21,67 @@ const KICKERS: Record<Screen, string> = {
   reflect: 'REFLECTION',
 };
 
-const TITLES: Record<Screen, string> = {
-  dash: '안녕하세요, 투자자님 👋',
-  cal: '매매 캘린더',
-  journal: '매매일지',
-  analysis: '성과 분석',
-  reflect: '감정 회고',
-};
-
 export default function App() {
+  return (
+    <AuthProvider>
+      <Gate />
+    </AuthProvider>
+  );
+}
+
+function Gate() {
+  const { session } = useAuth();
+
+  if (!isSupabaseConfigured) return <LoginScreen />;
+  if (session === undefined) return <Splash />;
+  if (!session) return <LoginScreen />;
+
+  return (
+    <TradesProvider>
+      <Shell />
+    </TradesProvider>
+  );
+}
+
+function Splash() {
+  return (
+    <div
+      style={{
+        minHeight: '100vh',
+        background: 'var(--bg)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'var(--ink-3)',
+        fontWeight: 700,
+        fontSize: 14,
+      }}
+    >
+      매매노트를 여는 중…
+    </div>
+  );
+}
+
+function Shell() {
+  const { session } = useAuth();
+  const { derived, error } = useTrades();
   const [screen, setScreen] = useState<Screen>('dash');
   const [calMode, setCalMode] = useState<CalMode>('month');
-  const [week, setWeek] = useState(1);
+  const [week, setWeek] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
+
+  const nickname =
+    (session?.user.user_metadata.name as string | undefined) ??
+    (session?.user.user_metadata.full_name as string | undefined) ??
+    '투자자';
+
+  const titles: Record<Screen, string> = {
+    dash: `안녕하세요, ${nickname}님 👋`,
+    cal: '매매 캘린더',
+    journal: '매매일지',
+    analysis: '성과 분석',
+    reflect: '감정 회고',
+  };
 
   return (
     <div className="app">
@@ -50,7 +102,7 @@ export default function App() {
               {KICKERS[screen]}
             </div>
             <h1 style={{ margin: 0, fontSize: 25, fontWeight: 800, letterSpacing: '-.03em' }}>
-              {TITLES[screen]}
+              {titles[screen]}
             </h1>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -68,7 +120,7 @@ export default function App() {
               }}
             >
               <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#3aa17e' }} />
-              2026년 7월
+              {derived.headerLabel}
             </div>
             <div
               role="button"
@@ -92,6 +144,24 @@ export default function App() {
         </header>
 
         <div className="content">
+          {error && (
+            <div
+              style={{
+                marginBottom: 16,
+                padding: '12px 16px',
+                borderRadius: 12,
+                background: 'var(--up-bg)',
+                color: 'var(--up)',
+                fontSize: 13,
+                fontWeight: 600,
+                lineHeight: 1.5,
+              }}
+            >
+              데이터를 불러오지 못했어요: {error}
+              <br />
+              Supabase에 스키마 마이그레이션(supabase/migrations)이 적용됐는지 확인해주세요.
+            </div>
+          )}
           {screen === 'dash' && <Dashboard onGoJournal={() => setScreen('journal')} />}
           {screen === 'cal' && (
             <CalendarScreen

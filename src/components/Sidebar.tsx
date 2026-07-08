@@ -1,4 +1,5 @@
 import type { Screen } from '../types';
+import { useAuth } from '../lib/auth';
 
 export const NAV_ITEMS: { id: Screen; label: string; icon: string }[] = [
   { id: 'dash', label: '대시보드', icon: '🏠' },
@@ -15,6 +16,12 @@ interface Props {
 }
 
 export default function Sidebar({ screen, onNavigate, onOpenModal }: Props) {
+  const { session, signOut } = useAuth();
+  const nickname =
+    (session?.user.user_metadata.name as string | undefined) ??
+    (session?.user.user_metadata.full_name as string | undefined) ??
+    '투자자';
+
   return (
     <aside className="sidebar">
       <div style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '6px 8px 20px' }}>
@@ -92,11 +99,33 @@ export default function Sidebar({ screen, onNavigate, onOpenModal }: Props) {
           >
             🐣
           </div>
-          <div style={{ lineHeight: 1.25 }}>
-            <div style={{ fontWeight: 700, fontSize: 13 }}>투자자님</div>
-            <div style={{ fontSize: 11, color: 'var(--ink-3)', fontWeight: 600 }}>
-              투자 시작 6개월차
+          <div style={{ lineHeight: 1.25, flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                fontWeight: 700,
+                fontSize: 13,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {nickname}님
             </div>
+            <button
+              onClick={() => void signOut()}
+              style={{
+                border: 'none',
+                background: 'none',
+                padding: 0,
+                fontSize: 11,
+                color: 'var(--ink-3)',
+                fontWeight: 600,
+                cursor: 'pointer',
+                textDecoration: 'underline',
+              }}
+            >
+              로그아웃
+            </button>
           </div>
         </div>
       </div>

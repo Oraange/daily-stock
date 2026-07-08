@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { CalMode, DayCell } from '../types';
-import { WEEKS } from '../data';
+import { useTrades } from '../lib/trades';
 import { DOWN, DOWN_BG, UP, UP_BG, eok, pnlColor, signed, won } from '../utils';
 import { WeeklyChart } from '../components/charts';
 
@@ -16,7 +16,10 @@ interface Props {
 }
 
 export default function CalendarScreen({ calMode, onChangeMode, week, onChangeWeek }: Props) {
+  const { derived } = useTrades();
+  const { weeks, monthLabel, monthPnl, tradingDays } = derived;
   const isMonth = calMode === 'month';
+  const wIdx = Math.min(Math.max(week, 0), weeks.length - 1);
 
   const toggleBtn = (active: boolean): CSSProperties => ({
     padding: '9px 18px',
@@ -32,11 +35,11 @@ export default function CalendarScreen({ calMode, onChangeMode, week, onChangeWe
   });
 
   // 주간 요약
-  const cur = WEEKS[week] ?? WEEKS[0];
+  const cur = weeks[wIdx];
   const real = cur.filter((x): x is DayCell => x != null);
   const wStart = real[0];
   const wEnd = real[real.length - 1];
-  const prevWeekEnd = WEEKS[week - 1]?.filter((x): x is DayCell => x != null).slice(-1)[0];
+  const prevWeekEnd = weeks[wIdx - 1]?.filter((x): x is DayCell => x != null).slice(-1)[0];
   const wDelta = wEnd.asset - (prevWeekEnd ? prevWeekEnd.asset : wStart.asset - (wStart.pnl || 0));
 
   return (
@@ -65,9 +68,14 @@ export default function CalendarScreen({ calMode, onChangeMode, week, onChangeWe
             className="card"
             style={{ borderRadius: 14, padding: '11px 18px', textAlign: 'center' }}
           >
-            <div style={{ fontSize: 11, color: 'var(--ink-3)', fontWeight: 600 }}>7월 실현손익</div>
-            <div className="num" style={{ fontSize: 18, fontWeight: 800, color: UP }}>
-              +1,240,000
+            <div style={{ fontSize: 11, color: 'var(--ink-3)', fontWeight: 600 }}>
+              {monthLabel} 실현손익
+            </div>
+            <div
+              className="num"
+              style={{ fontSize: 18, fontWeight: 800, color: pnlColor(monthPnl >= 0) }}
+            >
+              {signed(monthPnl)}
             </div>
           </div>
           <div
@@ -75,7 +83,7 @@ export default function CalendarScreen({ calMode, onChangeMode, week, onChangeWe
             style={{ borderRadius: 14, padding: '11px 18px', textAlign: 'center' }}
           >
             <div style={{ fontSize: 11, color: 'var(--ink-3)', fontWeight: 600 }}>거래일</div>
-            <div className="num" style={{ fontSize: 18, fontWeight: 800 }}>17일</div>
+            <div className="num" style={{ fontSize: 18, fontWeight: 800 }}>{tradingDays}일</div>
           </div>
         </div>
       </div>
@@ -107,7 +115,7 @@ export default function CalendarScreen({ calMode, onChangeMode, week, onChangeWe
             ))}
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 8 }}>
-            {WEEKS.flat().map((c, i) => {
+            {weeks.flat().map((c, i) => {
               if (!c)
                 return (
                   <div
@@ -220,7 +228,9 @@ export default function CalendarScreen({ calMode, onChangeMode, week, onChangeWe
             }}
           >
             <div>
-              <div style={{ fontWeight: 800, fontSize: 16 }}>7월 {week + 1}째 주</div>
+              <div style={{ fontWeight: 800, fontSize: 16 }}>
+                {monthLabel} {wIdx + 1}째 주
+              </div>
               <div style={{ fontSize: 12, color: 'var(--ink-3)', fontWeight: 600, marginTop: 2 }}>
                 한 주 동안의 자산 변동을 이어서 확인해요
               </div>
@@ -230,7 +240,7 @@ export default function CalendarScreen({ calMode, onChangeMode, week, onChangeWe
                 className="icon-btn"
                 aria-label="이전 주"
                 style={{ width: 36, height: 36 }}
-                onClick={() => onChangeWeek(Math.max(0, week - 1))}
+                onClick={() => onChangeWeek(Math.max(0, wIdx - 1))}
               >
                 ‹
               </button>
@@ -249,7 +259,7 @@ export default function CalendarScreen({ calMode, onChangeMode, week, onChangeWe
                 className="icon-btn"
                 aria-label="다음 주"
                 style={{ width: 36, height: 36 }}
-                onClick={() => onChangeWeek(Math.min(WEEKS.length - 1, week + 1))}
+                onClick={() => onChangeWeek(Math.min(weeks.length - 1, wIdx + 1))}
               >
                 ›
               </button>

@@ -8,6 +8,9 @@ export const eok = (n: number) => Math.round(n / 10000).toLocaleString('en-US') 
 
 export const signed = (n: number) => (n >= 0 ? '+' : '') + Math.round(n).toLocaleString('en-US');
 
+/** 수익률 % 표시 (예: +10.8%) */
+export const signedPct = (n: number) => (n >= 0 ? '+' : '') + n.toFixed(1) + '%';
+
 export const EMO_COLORS: Record<Emotion, string> = {
   침착: '#2f9e78',
   자신감: '#e0982f',
