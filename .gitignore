@@ -10,3 +10,8 @@ dist/
 .vscode/
 .idea/
 .DS_Store
+
+# Vercel
+.vercel
+.env*
+!.env.example
