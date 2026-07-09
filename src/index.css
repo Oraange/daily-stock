@@ -252,7 +252,7 @@ textarea.field-input {
   }
 
   .content {
-    padding: 16px 18px 96px;
+    padding: 16px 18px 120px; /* 탭바 + 솟아오른 FAB 높이만큼 확보 */
   }
 
   .grid-2col,
@@ -294,7 +294,31 @@ textarea.field-input {
     background: var(--coral-bg);
   }
 
+  /* footer 표면이 물방울처럼 솟아올라 FAB를 감싸는 마운드 */
+  .mobile-nav .nav-bump {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(100% - 2px); /* 2px 겹쳐서 탭바 상단 경계선을 마운드가 덮게 */
+    pointer-events: none;
+  }
+
+  .nav-bump-fill {
+    fill: var(--surface);
+  }
+
+  .nav-bump-line {
+    fill: none;
+    stroke: rgba(0, 0, 0, 0.06);
+    stroke-width: 1;
+  }
+
   .mobile-nav .fab {
+    position: absolute;
+    left: 50%;
+    top: -38px; /* 마운드 곡선(46px) 안에 상단 여백 5px 두고 안착 */
+    transform: translateX(-50%);
+    z-index: 1;
     width: 46px;
     height: 46px;
     border-radius: 50%;
@@ -304,7 +328,7 @@ textarea.field-input {
     font-weight: 800;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 6px 14px rgba(255, 107, 74, 0.32);
+    box-shadow: 0 4px 10px rgba(255, 107, 74, 0.3);
     padding: 0;
   }
 }
