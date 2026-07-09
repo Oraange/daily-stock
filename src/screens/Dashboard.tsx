@@ -12,7 +12,7 @@ export default function Dashboard({ onGoJournal }: Props) {
     totalAsset,
     totalPnl,
     monthPnl,
-    monthList,
+    equityDays,
     monthWins,
     monthLosses,
     winRatePct,
@@ -167,7 +167,7 @@ export default function Dashboard({ onGoJournal }: Props) {
               {derived.monthLabel} 일별
             </div>
           </div>
-          <EquityChart days={monthList} />
+          <EquityChart days={equityDays} monthLabel={derived.monthLabel} />
         </div>
 
         <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>

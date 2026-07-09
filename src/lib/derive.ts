@@ -18,6 +18,7 @@ export interface Derived {
   monthLabel: string; // '7월'
   headerLabel: string; // '2026년 7월'
   monthList: DayCell[];
+  equityDays: DayCell[]; // 자산 추이 그래프용 — 월초~오늘 (미래 날짜 제외)
   weeks: (DayCell | null)[][];
   totalAsset: number;
   totalPnl: number;
@@ -71,6 +72,9 @@ export function buildDerived(trades: UiTrade[], initialCapital: number, now = ne
     asset += pnl;
     monthList.push({ d, wd: new Date(y, m, d).getDay(), traded: countByDate.has(iso), pnl, asset });
   }
+
+  // 그래프는 오늘까지만 (캘린더용 monthList는 월 전체 유지)
+  const equityDays = monthList.slice(0, now.getDate());
 
   // 1일의 요일만큼 앞을 null 패딩 후 7개씩 chunk
   const startDay = new Date(y, m, 1).getDay();
@@ -153,6 +157,7 @@ export function buildDerived(trades: UiTrade[], initialCapital: number, now = ne
     monthLabel: `${m + 1}월`,
     headerLabel: `${y}년 ${m + 1}월`,
     monthList,
+    equityDays,
     weeks,
     totalAsset,
     totalPnl,

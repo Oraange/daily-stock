@@ -14,7 +14,8 @@ function linePts(
   const min = Math.min(...real);
   const max = Math.max(...real);
   const rng = max - min || 1;
-  const step = (w - 2 * padX) / (vals.length - 1);
+  // 점이 1개(매월 1일)여도 NaN 좌표가 나오지 않게
+  const step = vals.length > 1 ? (w - 2 * padX) / (vals.length - 1) : 0;
   return vals.map((v, i) =>
     v == null ? null : [padX + i * step, ht - padY - ((v - min) / rng) * (ht - 2 * padY)],
   );
@@ -24,9 +25,9 @@ function pathD(pts: [number, number][]) {
   return pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
 }
 
-// ---- 자산 추이 (대시보드, 최근 30일) ----
+// ---- 자산 추이 (대시보드, 월초~오늘) ----
 
-export function EquityChart({ days }: { days: DayCell[] }) {
+export function EquityChart({ days, monthLabel }: { days: DayCell[]; monthLabel: string }) {
   const w = 640;
   const ht = 190;
   const pad = 14;
@@ -104,7 +105,7 @@ export function EquityChart({ days }: { days: DayCell[] }) {
           }}
         >
           <div style={{ color: '#c9c2b6', fontWeight: 600, fontSize: 11 }}>
-            7월 {days[hover].d}일
+            {monthLabel} {days[hover].d}일
           </div>
           {won(series[hover])}
         </div>
