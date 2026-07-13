@@ -213,7 +213,13 @@ function Shell() {
         onOpenModal={() => setModal("new")}
       />
 
-      {modal && <TradeModal onClose={() => setModal(null)} />}
+      {modal && (
+        <TradeModal
+          key={modal === "new" ? "new" : modal.id}
+          editTarget={modal === "new" ? undefined : modal}
+          onClose={() => setModal(null)}
+        />
+      )}
     </div>
   );
 }

@@ -29,10 +29,12 @@ export default function TradeModal({ onClose, editTarget }: Props) {
 
   const [name, setName] = useState(editTarget?.name ?? "");
   const [side, setSide] = useState<Side>(editTarget?.side ?? "매수");
-  const [qty, setQty] = useState(String(editTarget?.qty) ?? "");
-  const [buyPrice, setBuyPrice] = useState(editTarget?.buyPrice ?? "");
+  const [qty, setQty] = useState(editTarget ? String(editTarget.qty) : "");
+  const [buyPrice, setBuyPrice] = useState(
+    editTarget ? String(editTarget.buyPrice) : "",
+  );
   const [sellPrice, setSellPrice] = useState(
-    String(editTarget?.sellPrice) ?? "",
+    editTarget?.sellPrice != null ? String(editTarget.sellPrice) : "",
   );
   const [tradedAt, setTradedAt] = useState(editTarget?.tradedAt ?? todayIso());
   const [emotion, setEmotion] = useState<Emotion>(
