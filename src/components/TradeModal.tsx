@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Emotion, Side, UiTrade } from "../types";
 import { DOWN, DOWN_BG, UP, UP_BG, emoColor } from "../utils";
 import { useTrades } from "../lib/trades";
+import { fetchAllStocks } from "../lib/db";
+import type { StockHit } from "../lib/db";
+import { filterStocks } from "../lib/stockSearch";
 
 const EMO_OPTIONS: Emotion[] = [
   "침착",
@@ -43,6 +46,50 @@ export default function TradeModal({ onClose, editTarget }: Props) {
   const [memo, setMemo] = useState(editTarget?.memo ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // 종목명 자동완성 — 전체 목록을 1회 로드해 메모리에서 즉시 매칭 (초성·공백 무시 지원)
+  const [allStocks, setAllStocks] = useState<StockHit[]>([]);
+  const [showHits, setShowHits] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(-1); // 키보드로 선택 중인 항목
+
+  useEffect(() => {
+    fetchAllStocks().then(setAllStocks).catch(() => {});
+  }, []);
+
+  const hits = useMemo(
+    () => (showHits ? filterStocks(allStocks, name) : []),
+    [allStocks, name, showHits],
+  );
+
+  useEffect(() => setActiveIdx(-1), [name]); // 검색어가 바뀌면 하이라이트 초기화
+
+  useEffect(() => {
+    if (activeIdx >= 0)
+      document
+        .getElementById(`stock-opt-${activeIdx}`)
+        ?.scrollIntoView({ block: "nearest" });
+  }, [activeIdx]);
+
+  const pickStock = (s: StockHit) => {
+    setName(s.name);
+    setShowHits(false);
+  };
+
+  const onNameKeyDown = (e: React.KeyboardEvent) => {
+    if (!showHits || hits.length === 0) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIdx((i) => Math.min(i + 1, hits.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIdx((i) => Math.max(i - 1, 0));
+    } else if (e.key === "Enter" && activeIdx >= 0) {
+      e.preventDefault();
+      pickStock(hits[activeIdx]);
+    } else if (e.key === "Escape") {
+      setShowHits(false);
+    }
+  };
 
   const onSave = async () => {
     const qtyN = Number(qty);
@@ -153,7 +200,7 @@ export default function TradeModal({ onClose, editTarget }: Props) {
           <div
             style={{ fontSize: 19, fontWeight: 800, letterSpacing: "-.02em" }}
           >
-            {editTarget ? "새 매매 기록" : "매매 기록 수정"}
+            {editTarget ? "매매 기록 수정" : "새 매매 기록"}
           </div>
           <button
             onClick={onClose}
@@ -178,13 +225,77 @@ export default function TradeModal({ onClose, editTarget }: Props) {
             <label className="field-label" htmlFor="trade-name">
               종목명
             </label>
-            <input
-              id="trade-name"
-              className="field-input"
-              placeholder="예) 삼성전자"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
+            <div style={{ position: "relative" }}>
+              <input
+                id="trade-name"
+                className="field-input"
+                placeholder="예) 삼성전자"
+                value={name}
+                autoComplete="off"
+                onChange={(e) => {
+                  setName(e.target.value);
+                  setShowHits(true);
+                }}
+                onKeyDown={onNameKeyDown}
+                onBlur={() => setShowHits(false)}
+                role="combobox"
+                aria-expanded={showHits && hits.length > 0}
+                aria-controls="stock-listbox"
+              />
+              {showHits && hits.length > 0 && (
+                <ul
+                  id="stock-listbox"
+                  role="listbox"
+                  style={{
+                    position: "absolute",
+                    top: "calc(100% + 6px)",
+                    left: 0,
+                    right: 0,
+                    zIndex: 10,
+                    margin: 0,
+                    padding: 6,
+                    listStyle: "none",
+                    background: "#fff",
+                    border: "1px solid rgba(0,0,0,.08)",
+                    borderRadius: 12,
+                    boxShadow: "0 12px 28px rgba(0,0,0,.14)",
+                    maxHeight: 236,
+                    overflowY: "auto",
+                  }}
+                >
+                  {hits.map((s, i) => (
+                    <li key={s.code} role="option" aria-selected={i === activeIdx}>
+                      <button
+                        type="button"
+                        id={`stock-opt-${i}`}
+                        className="stock-option"
+                        style={{
+                          background: i === activeIdx ? "var(--soft-2)" : undefined,
+                        }}
+                        onMouseEnter={() => setActiveIdx(i)}
+                        // onBlur(드롭다운 닫힘)보다 먼저 실행되도록 onMouseDown 사용
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          pickStock(s);
+                        }}
+                      >
+                        <span style={{ fontWeight: 700 }}>{s.name}</span>
+                        <span
+                          className="num"
+                          style={{
+                            fontSize: 11.5,
+                            fontWeight: 600,
+                            color: "var(--ink-3)",
+                          }}
+                        >
+                          {s.code} · {s.market}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
 
           <div

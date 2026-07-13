@@ -80,6 +80,33 @@ export async function deleteTrade(id: String): Promise<void> {
   if (error) throw error;
 }
 
+export interface StockHit {
+  code: string;
+  name: string;
+  market: string; // KOSPI / KOSDAQ / KONEX
+}
+
+let stocksCache: StockHit[] | null = null;
+
+/** 전체 종목 마스터 로드 — 최초 1회만 네트워크, 이후 메모리 캐시 (약 2,800건) */
+export async function fetchAllStocks(): Promise<StockHit[]> {
+  if (stocksCache) return stocksCache;
+  const page = 1000; // PostgREST 기본 최대 행수에 맞춰 페이지 조회
+  const rows: StockHit[] = [];
+  for (let from = 0; ; from += page) {
+    const { data, error } = await supabase
+      .from('stocks')
+      .select('code, name, market')
+      .order('code')
+      .range(from, from + page - 1);
+    if (error) throw error;
+    rows.push(...(data as StockHit[]));
+    if (data.length < page) break;
+  }
+  stocksCache = rows;
+  return rows;
+}
+
 export async function fetchInitialCapital(): Promise<number> {
   const { data, error } = await supabase
     .from("profiles")
