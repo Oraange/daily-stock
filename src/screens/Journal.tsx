@@ -1,33 +1,40 @@
-import { useState } from 'react';
-import { useTrades } from '../lib/trades';
-import { DOWN, UP, emoChipStyle, pnlColor, signed, signedPct } from '../utils';
+import { useState } from "react";
+import { useTrades } from "../lib/trades";
+import { DOWN, UP, emoChipStyle, pnlColor, signed, signedPct } from "../utils";
+import iconEdit from "../assets/icon-edit.svg";
+import iconDelete from "../assets/icon-delete.svg";
+import type { UiTrade } from "../types";
 
-const FILTERS = ['전체', '수익', '손실', '매수', '매도'] as const;
+const FILTERS = ["전체", "수익", "손실", "매수", "매도"] as const;
 type Filter = (typeof FILTERS)[number];
 
-const HEADER_COLS: { label: string; align?: 'right' | 'center' }[] = [
-  { label: '종목' },
-  { label: '구분' },
-  { label: '수량' },
-  { label: '평단/청산', align: 'right' },
-  { label: '손익', align: 'right' },
-  { label: '감정', align: 'center' },
+const HEADER_COLS: { label: string; align?: "right" | "center" }[] = [
+  { label: "종목" },
+  { label: "구분" },
+  { label: "수량" },
+  { label: "평단/청산", align: "right" },
+  { label: "손익", align: "right" },
+  { label: "감정", align: "center" },
 ];
 
-export default function Journal() {
-  const { trades } = useTrades();
-  const [filter, setFilter] = useState<Filter>('전체');
+export default function Journal({ onEdit }: { onEdit: (t: UiTrade) => void }) {
+  const { trades, removeTrade } = useTrades();
+  const handleDelete = (t: UiTrade) => {
+    if (window.confirm(`'${t.name}' 기록을 삭제할까요?`))
+      void removeTrade(t.id);
+  };
+  const [filter, setFilter] = useState<Filter>("전체");
 
   const rows = trades.filter((t) => {
     switch (filter) {
-      case '수익':
+      case "수익":
         return t.pnl != null && t.pnl > 0;
-      case '손실':
+      case "손실":
         return t.pnl != null && t.pnl < 0;
-      case '매수':
-        return t.side === '매수';
-      case '매도':
-        return t.side === '매도';
+      case "매수":
+        return t.side === "매수";
+      case "매도":
+        return t.side === "매도";
       default:
         return true;
     }
@@ -35,7 +42,9 @@ export default function Journal() {
 
   return (
     <div className="screen">
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+      <div
+        style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}
+      >
         {FILTERS.map((f) => {
           const active = filter === f;
           return (
@@ -43,14 +52,14 @@ export default function Journal() {
               key={f}
               onClick={() => setFilter(f)}
               style={{
-                padding: '9px 16px',
+                padding: "9px 16px",
                 borderRadius: 11,
                 fontWeight: 700,
                 fontSize: 13,
-                cursor: 'pointer',
-                border: `1px solid ${active ? 'var(--dark)' : 'rgba(0,0,0,.08)'}`,
-                background: active ? 'var(--dark)' : '#fff',
-                color: active ? '#fff' : 'var(--ink-2)',
+                cursor: "pointer",
+                border: `1px solid ${active ? "var(--dark)" : "rgba(0,0,0,.08)"}`,
+                background: active ? "var(--dark)" : "#fff",
+                color: active ? "#fff" : "var(--ink-2)",
               }}
             >
               {f}
@@ -59,18 +68,18 @@ export default function Journal() {
         })}
       </div>
 
-      <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+      <div className="card" style={{ padding: 0, overflow: "hidden" }}>
         <div
           style={{
-            display: 'grid',
-            gridTemplateColumns: '1.4fr .7fr .7fr .8fr 1fr .9fr',
+            display: "grid",
+            gridTemplateColumns: "1.4fr .7fr .7fr .8fr 1fr .9fr",
             gap: 12,
-            padding: '14px 22px',
-            background: 'var(--soft-1)',
+            padding: "14px 22px",
+            background: "var(--soft-1)",
             fontSize: 12,
             fontWeight: 700,
-            color: 'var(--ink-3)',
-            borderBottom: '1px solid rgba(0,0,0,.05)',
+            color: "var(--ink-3)",
+            borderBottom: "1px solid rgba(0,0,0,.05)",
           }}
         >
           {HEADER_COLS.map((c) => (
@@ -82,26 +91,32 @@ export default function Journal() {
 
         {rows.map((t) => (
           <div key={t.id} className="journal-row">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
               <div
                 style={{
                   width: 36,
                   height: 36,
                   borderRadius: 10,
-                  background: '#f5f2ed',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  background: "#f5f2ed",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                   fontWeight: 800,
                   fontSize: 13,
-                  color: '#6b655b',
+                  color: "#6b655b",
                 }}
               >
                 {t.name[0]}
               </div>
               <div>
                 <div style={{ fontWeight: 700, fontSize: 14 }}>{t.name}</div>
-                <div style={{ fontSize: 11.5, color: 'var(--ink-4)', fontWeight: 600 }}>
+                <div
+                  style={{
+                    fontSize: 11.5,
+                    color: "var(--ink-4)",
+                    fontWeight: 600,
+                  }}
+                >
                   {t.date}
                 </div>
               </div>
@@ -110,39 +125,67 @@ export default function Journal() {
               style={{
                 fontSize: 13,
                 fontWeight: 700,
-                color: t.side === '매수' ? UP : DOWN,
+                color: t.side === "매수" ? UP : DOWN,
               }}
             >
               {t.side}
             </span>
-            <span className="num" style={{ fontSize: 13, fontWeight: 600, color: '#6b655b' }}>
+            <span
+              className="num"
+              style={{ fontSize: 13, fontWeight: 600, color: "#6b655b" }}
+            >
               {t.qty}주
             </span>
             <div
               className="num"
-              style={{ textAlign: 'right', fontSize: 12.5, fontWeight: 600, color: '#6b655b' }}
+              style={{
+                textAlign: "right",
+                fontSize: 12.5,
+                fontWeight: 600,
+                color: "#6b655b",
+              }}
             >
               <div>{t.buy}</div>
-              <div style={{ color: 'var(--ink-4)' }}>{t.sell}</div>
+              <div style={{ color: "var(--ink-4)" }}>{t.sell}</div>
             </div>
-            <div className="num" style={{ textAlign: 'right' }}>
+            <div className="num" style={{ textAlign: "right" }}>
               {t.pnl == null ? (
-                <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--ink-3)' }}>보유중</div>
+                <div
+                  style={{
+                    fontWeight: 700,
+                    fontSize: 13,
+                    color: "var(--ink-3)",
+                  }}
+                >
+                  보유중
+                </div>
               ) : (
                 <>
-                  <div style={{ fontWeight: 800, fontSize: 14, color: pnlColor(t.up) }}>
+                  <div
+                    style={{
+                      fontWeight: 800,
+                      fontSize: 14,
+                      color: pnlColor(t.up),
+                    }}
+                  >
                     {signed(t.pnl)}
                   </div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: pnlColor(t.up) }}>
-                    {t.ret != null ? signedPct(t.ret) : ''}
+                  <div
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: pnlColor(t.up),
+                    }}
+                  >
+                    {t.ret != null ? signedPct(t.ret) : ""}
                   </div>
                 </>
               )}
             </div>
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{ display: "flex", justifyContent: "center" }}>
               <span
                 style={{
-                  padding: '5px 11px',
+                  padding: "5px 11px",
                   borderRadius: 9,
                   fontSize: 12,
                   fontWeight: 700,
@@ -152,17 +195,33 @@ export default function Journal() {
                 {t.emotion}
               </span>
             </div>
+            <div className="row-actions">
+              <button
+                className="row-action-btn"
+                aria-label="수정"
+                onClick={() => onEdit(t)}
+              >
+                <img src={iconEdit} width={15} height={15} alt="" />
+              </button>
+              <button
+                className="row-action-btn"
+                aria-label="삭제"
+                onClick={() => handleDelete(t)}
+              >
+                <img src={iconDelete} width={15} height={15} alt="" />
+              </button>
+            </div>
           </div>
         ))}
 
         {rows.length === 0 && (
           <div
             style={{
-              padding: '36px 22px',
-              textAlign: 'center',
+              padding: "36px 22px",
+              textAlign: "center",
               fontSize: 13,
               fontWeight: 600,
-              color: 'var(--ink-3)',
+              color: "var(--ink-3)",
             }}
           >
             조건에 맞는 매매 기록이 없어요

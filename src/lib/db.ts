@@ -1,5 +1,5 @@
-import { supabase } from './supabase';
-import type { Emotion, Side, UiTrade } from '../types';
+import { supabase } from "./supabase";
+import type { Emotion, Side, UiTrade } from "../types";
 
 /** trades 테이블 row (pnl은 DB 생성 컬럼) */
 export interface TradeRow {
@@ -29,7 +29,7 @@ export interface NewTrade {
 }
 
 const price = (n: number | null) =>
-  n == null ? '—' : Math.round(n).toLocaleString('en-US');
+  n == null ? "—" : Math.round(n).toLocaleString("en-US");
 
 export function toUiTrade(r: TradeRow): UiTrade {
   const ret =
@@ -40,7 +40,7 @@ export function toUiTrade(r: TradeRow): UiTrade {
     id: r.id,
     name: r.name,
     tradedAt: r.traded_at,
-    date: r.traded_at.slice(5).replace('-', '.'),
+    date: r.traded_at.slice(5).replace("-", "."),
     side: r.side,
     qty: r.qty,
     buyPrice: r.buy_price,
@@ -57,21 +57,34 @@ export function toUiTrade(r: TradeRow): UiTrade {
 
 export async function fetchTrades(): Promise<UiTrade[]> {
   const { data, error } = await supabase
-    .from('trades')
-    .select('*')
-    .order('traded_at', { ascending: false })
-    .order('created_at', { ascending: false });
+    .from("trades")
+    .select("*")
+    .order("traded_at", { ascending: false })
+    .order("created_at", { ascending: false });
   if (error) throw error;
   return (data as TradeRow[]).map(toUiTrade);
 }
 
 export async function insertTrade(input: NewTrade): Promise<void> {
-  const { error } = await supabase.from('trades').insert(input);
+  const { error } = await supabase.from("trades").insert(input);
+  if (error) throw error;
+}
+
+export async function updateTrade(input: NewTrade, id: String): Promise<void> {
+  const { error } = await supabase.from("trades").update(input).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteTrade(id: String): Promise<void> {
+  const { error } = await supabase.from("trades").delete().eq("id", id);
   if (error) throw error;
 }
 
 export async function fetchInitialCapital(): Promise<number> {
-  const { data, error } = await supabase.from('profiles').select('initial_capital').single();
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("initial_capital")
+    .single();
   if (error) return 0;
   return Number(data.initial_capital) || 0;
 }

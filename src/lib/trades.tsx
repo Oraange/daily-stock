@@ -1,10 +1,23 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import type { ReactNode } from 'react';
-import type { UiTrade } from '../types';
-import { fetchInitialCapital, fetchTrades, insertTrade } from './db';
-import type { NewTrade } from './db';
-import { buildDerived } from './derive';
-import type { Derived } from './derive';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import type { ReactNode } from "react";
+import type { UiTrade } from "../types";
+import {
+  fetchInitialCapital,
+  fetchTrades,
+  insertTrade,
+  updateTrade,
+  deleteTrade,
+} from "./db";
+import type { NewTrade } from "./db";
+import { buildDerived } from "./derive";
+import type { Derived } from "./derive";
 
 interface TradesValue {
   trades: UiTrade[];
@@ -13,6 +26,8 @@ interface TradesValue {
   error: string | null;
   refresh: () => Promise<void>;
   addTrade: (input: NewTrade) => Promise<void>;
+  editTrade: (input: NewTrade, id: String) => Promise<void>;
+  removeTrade: (id: String) => Promise<void>;
 }
 
 const TradesContext = createContext<TradesValue | null>(null);
@@ -26,11 +41,14 @@ export function TradesProvider({ children }: { children: ReactNode }) {
   const refresh = useCallback(async () => {
     try {
       setError(null);
-      const [t, cap] = await Promise.all([fetchTrades(), fetchInitialCapital()]);
+      const [t, cap] = await Promise.all([
+        fetchTrades(),
+        fetchInitialCapital(),
+      ]);
       setTrades(t);
       setInitialCapital(cap);
     } catch (e) {
-      setError(e instanceof Error ? e.message : '데이터를 불러오지 못했어요');
+      setError(e instanceof Error ? e.message : "데이터를 불러오지 못했어요");
     } finally {
       setLoading(false);
     }
@@ -48,10 +66,40 @@ export function TradesProvider({ children }: { children: ReactNode }) {
     [refresh],
   );
 
-  const derived = useMemo(() => buildDerived(trades, initialCapital), [trades, initialCapital]);
+  const editTrade = useCallback(
+    async (input: NewTrade, id: String) => {
+      await updateTrade(input, id);
+      await refresh();
+    },
+    [refresh],
+  );
+
+  const removeTrade = useCallback(
+    async (id: String) => {
+      await deleteTrade(id);
+      await refresh();
+    },
+    [refresh],
+  );
+
+  const derived = useMemo(
+    () => buildDerived(trades, initialCapital),
+    [trades, initialCapital],
+  );
 
   return (
-    <TradesContext.Provider value={{ trades, derived, loading, error, refresh, addTrade }}>
+    <TradesContext.Provider
+      value={{
+        trades,
+        derived,
+        loading,
+        error,
+        refresh,
+        addTrade,
+        editTrade,
+        removeTrade,
+      }}
+    >
       {children}
     </TradesContext.Provider>
   );
@@ -59,6 +107,6 @@ export function TradesProvider({ children }: { children: ReactNode }) {
 
 export function useTrades() {
   const ctx = useContext(TradesContext);
-  if (!ctx) throw new Error('useTrades must be used within TradesProvider');
+  if (!ctx) throw new Error("useTrades must be used within TradesProvider");
   return ctx;
 }

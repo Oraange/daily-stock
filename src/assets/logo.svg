@@ -1,0 +1,28 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="매매노트 로고">
+  <defs>
+    <linearGradient id="bg" x1="80" y1="40" x2="440" y2="480" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff8a5c"></stop>
+      <stop offset="1" stop-color="#ff5a36"></stop>
+    </linearGradient>
+    <linearGradient id="sheen" x1="120" y1="60" x2="300" y2="360" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".28"></stop>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"></stop>
+    </linearGradient>
+  </defs>
+
+  <rect x="56" y="56" width="400" height="400" rx="104" fill="url(#bg)"></rect>
+  <rect x="56" y="56" width="400" height="400" rx="104" fill="url(#sheen)"></rect>
+
+  <rect x="146" y="150" width="220" height="240" rx="30" fill="#ffffff"></rect>
+  <g fill="#ffd8c6">
+    <circle cx="182" cy="150" r="9"></circle>
+    <circle cx="230" cy="150" r="9"></circle>
+    <circle cx="278" cy="150" r="9"></circle>
+    <circle cx="326" cy="150" r="9"></circle>
+  </g>
+
+  <line x1="180" y1="330" x2="332" y2="330" stroke="#f0ede7" stroke-width="8" stroke-linecap="round"></line>
+
+  <polyline points="176,304 212,268 244,292 308,198" fill="none" stroke="#f04438" stroke-width="15" stroke-linejoin="round" stroke-linecap="round"></polyline>
+  <path d="M270 198 L308 198 L308 236" fill="none" stroke="#f04438" stroke-width="15" stroke-linejoin="round" stroke-linecap="round"></path>
+</svg>

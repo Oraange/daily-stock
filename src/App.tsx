@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Analytics } from "@vercel/analytics/react";
-import type { CalMode, Screen } from "./types";
+import { type CalMode, type Screen, type UiTrade } from "./types";
 import { AuthProvider, useAuth } from "./lib/auth";
 import { TradesProvider, useTrades } from "./lib/trades";
 import { isSupabaseConfigured } from "./lib/supabase";
@@ -70,7 +70,7 @@ function Shell() {
   const [screen, setScreen] = useState<Screen>("dash");
   const [calMode, setCalMode] = useState<CalMode>("month");
   const [week, setWeek] = useState(0);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [modal, setModal] = useState<UiTrade | "new" | null>(null);
 
   const nickname =
     (session?.user.user_metadata.name as string | undefined) ??
@@ -90,7 +90,7 @@ function Shell() {
       <Sidebar
         screen={screen}
         onNavigate={setScreen}
-        onOpenModal={() => setModalOpen(true)}
+        onOpenModal={() => setModal("new")}
       />
 
       <main
@@ -201,7 +201,7 @@ function Shell() {
               onChangeWeek={setWeek}
             />
           )}
-          {screen === "journal" && <Journal />}
+          {screen === "journal" && <Journal onEdit={setModal} />}
           {screen === "analysis" && <Analysis />}
           {screen === "reflect" && <Reflect />}
         </div>
@@ -210,10 +210,10 @@ function Shell() {
       <MobileNav
         screen={screen}
         onNavigate={setScreen}
-        onOpenModal={() => setModalOpen(true)}
+        onOpenModal={() => setModal("new")}
       />
 
-      {modalOpen && <TradeModal onClose={() => setModalOpen(false)} />}
+      {modal && <TradeModal onClose={() => setModal(null)} />}
     </div>
   );
 }
