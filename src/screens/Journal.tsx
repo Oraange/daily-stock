@@ -13,7 +13,7 @@ const HEADER_COLS: { label: string; align?: "right" | "center" }[] = [
   { label: "구분" },
   { label: "수량" },
   { label: "평단/청산", align: "right" },
-  { label: "손익", align: "right" },
+  { label: "손익", align: "center" },
   { label: "감정", align: "center" },
 ];
 
@@ -72,7 +72,7 @@ export default function Journal({ onEdit }: { onEdit: (t: UiTrade) => void }) {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1.4fr .7fr .7fr .8fr 1fr .9fr",
+            gridTemplateColumns: "1.4fr .7fr .55fr .8fr 1fr 1.25fr",
             gap: 12,
             padding: "14px 22px",
             background: "var(--soft-1)",
@@ -148,7 +148,7 @@ export default function Journal({ onEdit }: { onEdit: (t: UiTrade) => void }) {
               <div>{t.buy}</div>
               <div style={{ color: "var(--ink-4)" }}>{t.sell}</div>
             </div>
-            <div className="num" style={{ textAlign: "right" }}>
+            <div className="num" style={{ textAlign: "center" }}>
               {t.pnl == null ? (
                 <div
                   style={{
