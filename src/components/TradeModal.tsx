@@ -31,6 +31,9 @@ export default function TradeModal({ onClose, editTarget }: Props) {
   const { addTrade, editTrade } = useTrades();
 
   const [name, setName] = useState(editTarget?.name ?? "");
+  const [stockCode, setStockCode] = useState<string | null>(
+    editTarget?.stockCode ?? null,
+  );
   const [side, setSide] = useState<Side>(editTarget?.side ?? "매수");
   const [qty, setQty] = useState(editTarget ? String(editTarget.qty) : "");
   const [buyPrice, setBuyPrice] = useState(
@@ -72,6 +75,7 @@ export default function TradeModal({ onClose, editTarget }: Props) {
 
   const pickStock = (s: StockHit) => {
     setName(s.name);
+    setStockCode(s.code); // 마스터에서 선택 → 소프트 참조 저장
     setShowHits(false);
   };
 
@@ -108,30 +112,18 @@ export default function TradeModal({ onClose, editTarget }: Props) {
     try {
       setBusy(true);
       setError(null);
-      editTarget
-        ? await editTrade(
-            {
-              name: name.trim(),
-              side,
-              qty: Math.floor(qtyN),
-              buy_price: buyN,
-              sell_price: sellN,
-              emotion,
-              memo: memo.trim(),
-              traded_at: tradedAt,
-            },
-            editTarget.id,
-          )
-        : await addTrade({
-            name: name.trim(),
-            side,
-            qty: Math.floor(qtyN),
-            buy_price: buyN,
-            sell_price: sellN,
-            emotion,
-            memo: memo.trim(),
-            traded_at: tradedAt,
-          });
+      const payload = {
+        name: name.trim(),
+        side,
+        qty: Math.floor(qtyN),
+        buy_price: buyN,
+        sell_price: sellN,
+        emotion,
+        memo: memo.trim(),
+        traded_at: tradedAt,
+        stock_code: stockCode,
+      };
+      editTarget ? await editTrade(payload, editTarget.id) : await addTrade(payload);
       onClose();
     } catch (e) {
       setError(
@@ -234,6 +226,7 @@ export default function TradeModal({ onClose, editTarget }: Props) {
                 autoComplete="off"
                 onChange={(e) => {
                   setName(e.target.value);
+                  setStockCode(null); // 직접 수정하면 선택했던 종목과 달라지므로 참조 해제
                   setShowHits(true);
                 }}
                 onKeyDown={onNameKeyDown}

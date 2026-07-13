@@ -13,6 +13,7 @@ export interface TradeRow {
   emotion: Emotion;
   memo: string;
   traded_at: string; // 'YYYY-MM-DD'
+  stock_code: string | null; // stocks.code 소프트 참조
   pnl: number | null;
   created_at: string;
 }
@@ -26,6 +27,7 @@ export interface NewTrade {
   emotion: Emotion;
   memo: string;
   traded_at: string;
+  stock_code: string | null;
 }
 
 const price = (n: number | null) =>
@@ -39,6 +41,7 @@ export function toUiTrade(r: TradeRow): UiTrade {
   return {
     id: r.id,
     name: r.name,
+    stockCode: r.stock_code,
     tradedAt: r.traded_at,
     date: r.traded_at.slice(5).replace("-", "."),
     side: r.side,
@@ -83,7 +86,7 @@ export async function deleteTrade(id: String): Promise<void> {
 export interface StockHit {
   code: string;
   name: string;
-  market: string; // KOSPI / KOSDAQ / KONEX
+  market: string; // KOSPI / KOSDAQ / KONEX / ETF / ETN
 }
 
 let stocksCache: StockHit[] | null = null;

@@ -10,6 +10,8 @@ export type Emotion = '침착' | '자신감' | '불안' | '조급' | '욕심' | 
 export interface UiTrade {
   id: string;
   name: string;
+  /** stocks.code 소프트 참조 (자동완성 선택 시에만, 직접 입력이면 null) */
+  stockCode: string | null;
   /** 'MM.DD' 표시용 */
   date: string;
   /** 'YYYY-MM-DD' */
